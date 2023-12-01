@@ -1,9 +1,9 @@
-'''Base module for calling SoX '''
+"""Base module for calling SoX """
 
 import subprocess
 from pathlib import Path
 from subprocess import CalledProcessError
-from typing import Union, List, Optional, Tuple, Iterable, Any
+from typing import Any, Iterable, List, Optional, Tuple, Union
 
 import numpy as np
 from typing_extensions import Literal
@@ -11,23 +11,38 @@ from typing_extensions import Literal
 from . import NO_SOX
 from .log import logger
 
-SOXI_ARGS = ['B', 'b', 'c', 'a', 'D', 'e', 't', 's', 'r']
+SOXI_ARGS = ["B", "b", "c", "a", "D", "e", "t", "s", "r"]
 
 ENCODING_VALS = [
-    'signed-integer', 'unsigned-integer', 'floating-point', 'a-law', 'u-law',
-    'oki-adpcm', 'ima-adpcm', 'ms-adpcm', 'gsm-full-rate'
+    "signed-integer",
+    "unsigned-integer",
+    "floating-point",
+    "a-law",
+    "u-law",
+    "oki-adpcm",
+    "ima-adpcm",
+    "ms-adpcm",
+    "gsm-full-rate",
 ]
 EncodingValue = Literal[
-    'signed-integer', 'unsigned-integer', 'floating-point', 'a-law', 'u-law',
-    'oki-adpcm', 'ima-adpcm', 'ms-adpcm', 'gsm-full-rate'
+    "signed-integer",
+    "unsigned-integer",
+    "floating-point",
+    "a-law",
+    "u-law",
+    "oki-adpcm",
+    "ima-adpcm",
+    "ms-adpcm",
+    "gsm-full-rate",
 ]
 
 
-def sox(args: Iterable[str],
-        src_array: Optional[np.ndarray] = None,
-        decode_out_with_utf: bool = True) -> \
-        Tuple[bool, Optional[Union[str, np.ndarray]], Optional[str]]:
-    '''Pass an argument list to SoX.
+def sox(
+    args: Iterable[str],
+    src_array: Optional[np.ndarray] = None,
+    decode_out_with_utf: bool = True,
+) -> Tuple[bool, Optional[Union[str, np.ndarray]], Optional[str]]:
+    """Pass an argument list to SoX.
 
     Parameters
     ----------
@@ -52,7 +67,7 @@ def sox(args: Iterable[str],
     err : str, or None
         Returns stderr as a string.
 
-    '''
+    """
     # Explicitly convert python3 pathlib.Path objects to strings.
     args = [str(x) for x in args]
 
@@ -62,7 +77,7 @@ def sox(args: Iterable[str],
         args[0] = "sox"
 
     try:
-        logger.info("Executing: %s", ' '.join(args))
+        logger.info("Executing: %s", " ".join(args))
 
         if src_array is None:
             process_handle = subprocess.Popen(
@@ -80,12 +95,12 @@ def sox(args: Iterable[str],
                 args,
                 stdin=subprocess.PIPE,
                 stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE
+                stderr=subprocess.PIPE,
             )
             # We do order "F" for Fortran formatting of the numpy array, which is
             # sox expects. When we reshape stdout later, we need to use the same
             # order, otherwise tests fail.
-            out, err = process_handle.communicate(src_array.T.tobytes(order='F'))
+            out, err = process_handle.communicate(src_array.T.tobytes(order="F"))
             err = err.decode("utf-8")
             status = process_handle.returncode
         else:
@@ -101,15 +116,14 @@ def sox(args: Iterable[str],
 
 
 class SoxError(Exception):
-    '''Exception to be raised when SoX exits with non-zero status.
-    '''
+    """Exception to be raised when SoX exits with non-zero status."""
 
     def __init__(self, *args, **kwargs):
         Exception.__init__(self, *args, **kwargs)
 
 
 def _get_valid_formats() -> List[str]:
-    ''' Calls SoX help for a lists of audio formats available with the current
+    """Calls SoX help for a lists of audio formats available with the current
     install of SoX.
 
     Returns
@@ -117,16 +131,16 @@ def _get_valid_formats() -> List[str]:
     formats : list
         List of audio file extensions that SoX can process.
 
-    '''
+    """
     if NO_SOX:
         return []
 
-    so = subprocess.check_output(['sox', '-h'])
+    so = subprocess.check_output(["sox", "-h"])
     if type(so) is not str:
-        so = str(so, encoding='UTF-8')
-    so = so.split('\n')
-    idx = [i for i in range(len(so)) if 'AUDIO FILE FORMATS:' in so[i]][0]
-    formats = so[idx].split(' ')[3:]
+        so = str(so, encoding="UTF-8")
+    so = so.split("\n")
+    idx = [i for i in range(len(so)) if "AUDIO FILE FORMATS:" in so[i]][0]
+    formats = so[idx].split(" ")[3:]
 
     return formats
 
@@ -135,7 +149,7 @@ VALID_FORMATS = _get_valid_formats()
 
 
 def soxi(filepath: Union[str, Path], argument: str) -> str:
-    ''' Base call to SoXI.
+    """Base call to SoXI.
 
     Parameters
     ----------
@@ -149,32 +163,29 @@ def soxi(filepath: Union[str, Path], argument: str) -> str:
     -------
     shell_output : str
         Command line output of SoXI
-    '''
+    """
     filepath = str(filepath)
 
     if argument not in SOXI_ARGS:
         raise ValueError("Invalid argument '{}' to SoXI".format(argument))
 
-    args = ['sox', '--i']
+    args = ["sox", "--i"]
     args.append("-{}".format(argument))
     args.append(filepath)
 
     try:
-        shell_output = subprocess.check_output(
-            args,
-            stderr=subprocess.PIPE
-        )
+        shell_output = subprocess.check_output(args, stderr=subprocess.PIPE)
     except CalledProcessError as cpe:
         logger.info("SoXI error message: {}".format(cpe.output))
         raise SoxiError("SoXI failed with exit code {}".format(cpe.returncode))
 
     shell_output = shell_output.decode("utf-8")
 
-    return str(shell_output).strip('\n')
+    return str(shell_output).strip("\n")
 
 
 def play(args: Iterable[str]) -> bool:
-    '''Pass an argument list to play.
+    """Pass an argument list to play.
 
     Parameters
     ----------
@@ -187,7 +198,7 @@ def play(args: Iterable[str]) -> bool:
     status : bool
         True on success.
 
-    '''
+    """
     # Make sure all inputs are strings (eg not pathlib.Path)
     args = [str(x) for x in args]
 
@@ -219,15 +230,14 @@ def play(args: Iterable[str]) -> bool:
 
 
 class SoxiError(Exception):
-    '''Exception to be raised when SoXI exits with non-zero status.
-    '''
+    """Exception to be raised when SoXI exits with non-zero status."""
 
     def __init__(self, *args, **kwargs):
         Exception.__init__(self, *args, **kwargs)
 
 
 def is_number(var: Any) -> bool:
-    '''Check if variable is a numeric value.
+    """Check if variable is a numeric value.
 
     Parameters
     ----------
@@ -237,7 +247,7 @@ def is_number(var: Any) -> bool:
     -------
     is_number : bool
         True if var is numeric, False otherwise.
-    '''
+    """
     try:
         float(var)
         return True
@@ -248,7 +258,7 @@ def is_number(var: Any) -> bool:
 
 
 def all_equal(list_of_things: List[Any]) -> bool:
-    '''Check if a list contains identical elements.
+    """Check if a list contains identical elements.
 
     Parameters
     ----------
@@ -259,5 +269,5 @@ def all_equal(list_of_things: List[Any]) -> bool:
     -------
     all_equal : bool
         True if all list elements are the same.
-    '''
+    """
     return len(set(list_of_things)) <= 1

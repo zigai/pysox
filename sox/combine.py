@@ -1,54 +1,56 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-'''
+"""
 Python wrapper around the SoX library.
 This module requires that SoX is installed.
-'''
+"""
 
 from __future__ import print_function
 
 from pathlib import Path
-from typing import Union, Optional, List
+from typing import List, Optional, Union
 
 from typing_extensions import Literal
 
-from . import core
-from . import file_info
-from .core import ENCODING_VALS, EncodingValue
-from .core import SoxError
-from .core import SoxiError
-from .core import VALID_FORMATS
-from .core import is_number
-from .core import play
-from .core import sox
+from . import core, file_info
+from .core import (
+    ENCODING_VALS,
+    VALID_FORMATS,
+    EncodingValue,
+    SoxError,
+    SoxiError,
+    is_number,
+    play,
+    sox,
+)
 from .log import logger
 from .transform import Transformer
 
-COMBINE_VALS = [
-    'concatenate', 'merge', 'mix', 'mix-power', 'multiply'
-]
+COMBINE_VALS = ["concatenate", "merge", "mix", "mix-power", "multiply"]
 
-CombineType = Literal['concatenate', 'merge', 'mix', 'mix-power', 'multiply']
+CombineType = Literal["concatenate", "merge", "mix", "mix-power", "multiply"]
 
 
 class Combiner(Transformer):
-    '''Audio file combiner.
+    """Audio file combiner.
     Class which allows multiple files to be combined to create an output
     file, saved to output_filepath.
 
     Inherits all methods from the Transformer class, thus any effects can be
     applied after combining.
-    '''
+    """
 
     def __init__(self):
         super(Combiner, self).__init__()
 
-    def build(self,
-              input_filepath_list: Union[str, Path],
-              output_filepath: Union[str, Path],
-              combine_type: CombineType,
-              input_volumes: Optional[List[float]] = None):
-        '''Builds the output_file by executing the current set of commands.
+    def build(
+        self,
+        input_filepath_list: Union[str, Path],
+        output_filepath: Union[str, Path],
+        combine_type: CombineType,
+        input_volumes: Optional[List[float]] = None,
+    ):
+        """Builds the output_file by executing the current set of commands.
 
         Parameters
         ----------
@@ -80,15 +82,14 @@ class Combiner(Transformer):
         status : bool
             True on success.
 
-        '''
+        """
         file_info.validate_input_file_list(input_filepath_list)
         file_info.validate_output_file(output_filepath)
         _validate_combine_type(combine_type)
         _validate_volumes(input_volumes)
 
         input_format_list = _build_input_format_list(
-            input_filepath_list, input_volumes,
-            self.input_format
+            input_filepath_list, input_volumes, self.input_format
         )
 
         try:
@@ -98,7 +99,7 @@ class Combiner(Transformer):
 
         args = []
         args.extend(self.globals)
-        args.extend(['--combine', combine_type])
+        args.extend(["--combine", combine_type])
 
         input_args = _build_input_args(input_filepath_list, input_format_list)
         args.extend(input_args)
@@ -110,25 +111,25 @@ class Combiner(Transformer):
         status, out, err = sox(args)
 
         if status != 0:
-            raise SoxError(
-                "Stdout: {}\nStderr: {}".format(out, err)
-            )
+            raise SoxError("Stdout: {}\nStderr: {}".format(out, err))
         else:
             logger.info(
                 "Created %s with combiner %s and  effects: %s",
                 output_filepath,
                 combine_type,
-                " ".join(self.effects_log)
+                " ".join(self.effects_log),
             )
             if out is not None:
                 logger.info("[SoX] {}".format(out))
             return True
 
-    def preview(self,
-                input_filepath_list: List[Union[str, Path]],
-                combine_type: CombineType,
-                input_volumes: Optional[List[float]] = None):
-        '''Play a preview of the output with the current set of effects
+    def preview(
+        self,
+        input_filepath_list: List[Union[str, Path]],
+        combine_type: CombineType,
+        input_volumes: Optional[List[float]] = None,
+    ):
+        """Play a preview of the output with the current set of effects
 
         Parameters
         ----------
@@ -152,10 +153,10 @@ class Combiner(Transformer):
             are applied to the input files in order.
             If None, input files will be combined at their original volumes.
 
-        '''
+        """
         args = ["play", "--no-show-progress"]
         args.extend(self.globals)
-        args.extend(['--combine', combine_type])
+        args.extend(["--combine", combine_type])
 
         input_format_list = _build_input_format_list(
             input_filepath_list, input_volumes, self.input_format
@@ -166,14 +167,16 @@ class Combiner(Transformer):
 
         play(args)
 
-    def set_input_format(self,
-                         file_type: Optional[List[str]] = None,
-                         rate: Optional[List[float]] = None,
-                         bits: Optional[List[int]] = None,
-                         channels: Optional[List[int]] = None,
-                         encoding: Optional[List[EncodingValue]] = None,
-                         ignore_length: Optional[List[bool]] = None):
-        '''Sets input file format arguments. This is primarily useful when
+    def set_input_format(
+        self,
+        file_type: Optional[List[str]] = None,
+        rate: Optional[List[float]] = None,
+        bits: Optional[List[int]] = None,
+        channels: Optional[List[int]] = None,
+        encoding: Optional[List[EncodingValue]] = None,
+        ignore_length: Optional[List[bool]] = None,
+    ):
+        """Sets input file format arguments. This is primarily useful when
         dealing with audio files without a file extension. Overwrites any
         previously set input file arguments.
 
@@ -235,15 +238,14 @@ class Combiner(Transformer):
             file’s header. If this option is given then SoX will keep reading
             audio until it reaches the end of the input file.
 
-        '''
+        """
         if file_type is not None and not isinstance(file_type, list):
             raise ValueError("file_type must be a list or None.")
 
         if file_type is not None:
             if not all([f in VALID_FORMATS for f in file_type]):
                 raise ValueError(
-                    'file_type elements '
-                    'must be one of {}'.format(VALID_FORMATS)
+                    "file_type elements " "must be one of {}".format(VALID_FORMATS)
                 )
         else:
             file_type = []
@@ -253,7 +255,7 @@ class Combiner(Transformer):
 
         if rate is not None:
             if not all([is_number(r) and r > 0 for r in rate]):
-                raise ValueError('rate elements must be positive floats.')
+                raise ValueError("rate elements must be positive floats.")
         else:
             rate = []
 
@@ -262,7 +264,7 @@ class Combiner(Transformer):
 
         if bits is not None:
             if not all([isinstance(b, int) and b > 0 for b in bits]):
-                raise ValueError('bit elements must be positive ints.')
+                raise ValueError("bit elements must be positive ints.")
         else:
             bits = []
 
@@ -271,7 +273,7 @@ class Combiner(Transformer):
 
         if channels is not None:
             if not all([isinstance(c, int) and c > 0 for c in channels]):
-                raise ValueError('channel elements must be positive ints.')
+                raise ValueError("channel elements must be positive ints.")
         else:
             channels = []
 
@@ -281,8 +283,7 @@ class Combiner(Transformer):
         if encoding is not None:
             if not all([e in ENCODING_VALS for e in encoding]):
                 raise ValueError(
-                    'elements of encoding must '
-                    'be one of {}'.format(ENCODING_VALS)
+                    "elements of encoding must " "be one of {}".format(ENCODING_VALS)
                 )
         else:
             encoding = []
@@ -296,85 +297,85 @@ class Combiner(Transformer):
         else:
             ignore_length = []
 
-        max_input_arg_len = max([
-            len(file_type), len(rate), len(bits), len(channels),
-            len(encoding), len(ignore_length)
-        ])
+        max_input_arg_len = max(
+            [
+                len(file_type),
+                len(rate),
+                len(bits),
+                len(channels),
+                len(encoding),
+                len(ignore_length),
+            ]
+        )
 
         input_format = []
         for _ in range(max_input_arg_len):
             input_format.append([])
 
         for i, f in enumerate(file_type):
-            input_format[i].extend(['-t', '{}'.format(f)])
+            input_format[i].extend(["-t", "{}".format(f)])
 
         for i, r in enumerate(rate):
-            input_format[i].extend(['-r', '{}'.format(r)])
+            input_format[i].extend(["-r", "{}".format(r)])
 
         for i, b in enumerate(bits):
-            input_format[i].extend(['-b', '{}'.format(b)])
+            input_format[i].extend(["-b", "{}".format(b)])
 
         for i, c in enumerate(channels):
-            input_format[i].extend(['-c', '{}'.format(c)])
+            input_format[i].extend(["-c", "{}".format(c)])
 
         for i, e in enumerate(encoding):
-            input_format[i].extend(['-e', '{}'.format(e)])
+            input_format[i].extend(["-e", "{}".format(e)])
 
         for i, l in enumerate(ignore_length):
             if l is True:
-                input_format[i].append('--ignore-length')
+                input_format[i].append("--ignore-length")
 
         self.input_format = input_format
         return self
 
 
-def _validate_file_formats(input_filepath_list: List[Union[str, Path]],
-                           combine_type: CombineType):
-    '''Validate that combine method can be performed with given files.
+def _validate_file_formats(
+    input_filepath_list: List[Union[str, Path]], combine_type: CombineType
+):
+    """Validate that combine method can be performed with given files.
     Raises IOError if input file formats are incompatible.
-    '''
+    """
     _validate_sample_rates(input_filepath_list, combine_type)
 
-    if combine_type == 'concatenate':
+    if combine_type == "concatenate":
         _validate_num_channels(input_filepath_list, combine_type)
 
 
-def _validate_sample_rates(input_filepath_list: List[Path],
-                           combine_type: CombineType):
-    ''' Check if files in input file list have the same sample rate
-    '''
-    sample_rates = [
-        file_info.sample_rate(f) for f in input_filepath_list
-    ]
+def _validate_sample_rates(input_filepath_list: List[Path], combine_type: CombineType):
+    """Check if files in input file list have the same sample rate"""
+    sample_rates = [file_info.sample_rate(f) for f in input_filepath_list]
     if not core.all_equal(sample_rates):
         raise IOError(
             "Input files do not have the same sample rate. The {} combine "
-            "type requires that all files have the same sample rate"
-                .format(combine_type)
+            "type requires that all files have the same sample rate".format(
+                combine_type
+            )
         )
 
 
-def _validate_num_channels(input_filepath_list: List[Path],
-                           combine_type: CombineType):
-    ''' Check if files in input file list have the same number of channels
-    '''
-    channels = [
-        file_info.channels(f) for f in input_filepath_list
-    ]
+def _validate_num_channels(input_filepath_list: List[Path], combine_type: CombineType):
+    """Check if files in input file list have the same number of channels"""
+    channels = [file_info.channels(f) for f in input_filepath_list]
     if not core.all_equal(channels):
         raise IOError(
             "Input files do not have the same number of channels. The "
             "{} combine type requires that all files have the same "
-            "number of channels"
-                .format(combine_type)
+            "number of channels".format(combine_type)
         )
 
 
-def _build_input_format_list(input_filepath_list: List[Path],
-                             input_volumes: Optional[List[float]] = None,
-                             input_format: Optional[List[List[str]]] = None) \
-        -> List[str]:
-    '''Set input formats given input_volumes.
+def _build_input_format_list(
+    input_filepath_list: List[Path],
+    input_volumes: Optional[List[float]] = None,
+    input_format: Optional[List[List[str]]] = None,
+) -> List[str]:
+    """Set input formats given input_volumes.
 
     Parameters
     ----------
@@ -389,7 +390,7 @@ def _build_input_format_list(input_filepath_list: List[Path],
         arguments are applied to the input files in order.
         If None, the input formats will be inferred from the file header.
 
-    '''
+    """
     n_inputs = len(input_filepath_list)
     input_format_list = []
     for _ in range(n_inputs):
@@ -402,16 +403,20 @@ def _build_input_format_list(input_filepath_list: List[Path],
         n_volumes = len(input_volumes)
         if n_volumes < n_inputs:
             logger.warning(
-                'Volumes were only specified for %s out of %s files.'
-                'The last %s files will remain at their original volumes.',
-                n_volumes, n_inputs, n_inputs - n_volumes
+                "Volumes were only specified for %s out of %s files."
+                "The last %s files will remain at their original volumes.",
+                n_volumes,
+                n_inputs,
+                n_inputs - n_volumes,
             )
             vols = input_volumes + [1] * (n_inputs - n_volumes)
         elif n_volumes > n_inputs:
             logger.warning(
-                '%s volumes were specified but only %s input files exist.'
-                'The last %s volumes will be ignored.',
-                n_volumes, n_inputs, n_volumes - n_inputs
+                "%s volumes were specified but only %s input files exist."
+                "The last %s volumes will be ignored.",
+                n_volumes,
+                n_inputs,
+                n_volumes - n_inputs,
             )
             vols = input_volumes[:n_inputs]
         else:
@@ -424,34 +429,39 @@ def _build_input_format_list(input_filepath_list: List[Path],
         n_fmts = len(input_format)
         if n_fmts < n_inputs:
             logger.warning(
-                'Input formats were only specified for %s out of %s files.'
-                'The last %s files will remain unformatted.',
-                n_fmts, n_inputs, n_inputs - n_fmts
+                "Input formats were only specified for %s out of %s files."
+                "The last %s files will remain unformatted.",
+                n_fmts,
+                n_inputs,
+                n_inputs - n_fmts,
             )
             fmts = [f for f in input_format]
             fmts.extend([[] for _ in range(n_inputs - n_fmts)])
         elif n_fmts > n_inputs:
             logger.warning(
-                '%s Input formats were specified but only %s input files exist'
-                '. The last %s formats will be ignored.',
-                n_fmts, n_inputs, n_fmts - n_inputs
+                "%s Input formats were specified but only %s input files exist"
+                ". The last %s formats will be ignored.",
+                n_fmts,
+                n_inputs,
+                n_fmts - n_inputs,
             )
             fmts = input_format[:n_inputs]
         else:
             fmts = [f for f in input_format]
 
     for i, (vol, fmt) in enumerate(zip(vols, fmts)):
-        input_format_list[i].extend(['-v', '{}'.format(vol)])
+        input_format_list[i].extend(["-v", "{}".format(vol)])
         input_format_list[i].extend(fmt)
 
     return input_format_list
 
 
-def _build_input_args(input_filepath_list: List[Path],
-                      input_format_list: List[str]) -> List[str]:
-    ''' Builds input arguments by stitching input filepaths and input
+def _build_input_args(
+    input_filepath_list: List[Path], input_format_list: List[str]
+) -> List[str]:
+    """Builds input arguments by stitching input filepaths and input
     formats together.
-    '''
+    """
     # Convert pathlib.Paths to strings.
     input_filepath_list = [str(x) for x in input_filepath_list]
     if len(input_format_list) != len(input_filepath_list):
@@ -469,30 +479,29 @@ def _build_input_args(input_filepath_list: List[Path],
 
 
 def _validate_combine_type(combine_type: List[CombineType]):
-    '''Check that the combine_type is valid.
+    """Check that the combine_type is valid.
 
     Parameters
     ----------
     combine_type : str
         Combine type.
 
-    '''
+    """
     if combine_type not in COMBINE_VALS:
         raise ValueError(
-            'Invalid value for combine_type. Must be one of {}'.format(
-                COMBINE_VALS)
+            "Invalid value for combine_type. Must be one of {}".format(COMBINE_VALS)
         )
 
 
 def _validate_volumes(input_volumes: List[float]):
-    '''Check input_volumes contains a valid list of volumes.
+    """Check input_volumes contains a valid list of volumes.
 
     Parameters
     ----------
     input_volumes : list
         list of volume values. Castable to numbers.
 
-    '''
+    """
     if not (input_volumes is None or isinstance(input_volumes, list)):
         raise TypeError("input_volumes must be None or a list.")
 
@@ -500,6 +509,5 @@ def _validate_volumes(input_volumes: List[float]):
         for vol in input_volumes:
             if not core.is_number(vol):
                 raise ValueError(
-                    "Elements of input_volumes must be numbers: found {}"
-                        .format(vol)
+                    "Elements of input_volumes must be numbers: found {}".format(vol)
                 )

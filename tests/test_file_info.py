@@ -1,6 +1,6 @@
-from pathlib import Path
 import os
 import unittest
+from pathlib import Path
 
 from sox import file_info
 from sox.core import SoxError
@@ -11,17 +11,16 @@ def relpath(f):
 
 
 SPACEY_FILE = relpath("data/annoying filename (derp).wav")
-INPUT_FILE = relpath('data/input.wav')
-INPUT_FILE2 = relpath('data/input.aiff')
-INPUT_FILE3 = relpath('data/input.WAV')
-EMPTY_FILE = relpath('data/empty.wav')
-INPUT_FILE_INVALID = relpath('data/input.xyz')
-OUTPUT_FILE = relpath('data/output.wav')
-SILENT_FILE = relpath('data/silence.wav')
+INPUT_FILE = relpath("data/input.wav")
+INPUT_FILE2 = relpath("data/input.aiff")
+INPUT_FILE3 = relpath("data/input.WAV")
+EMPTY_FILE = relpath("data/empty.wav")
+INPUT_FILE_INVALID = relpath("data/input.xyz")
+OUTPUT_FILE = relpath("data/output.wav")
+SILENT_FILE = relpath("data/silence.wav")
 
 
 class TestBitrate(unittest.TestCase):
-
     def test_wav(self):
         actual = file_info.bitrate(INPUT_FILE)
         expected = 706000.0
@@ -43,9 +42,7 @@ class TestBitrate(unittest.TestCase):
         self.assertEqual(expected, actual)
 
 
-
 class TestBitdepth(unittest.TestCase):
-
     def test_wav(self):
         actual = file_info.bitdepth(INPUT_FILE)
         expected = 16
@@ -73,7 +70,6 @@ class TestBitdepth(unittest.TestCase):
 
 
 class TestChannels(unittest.TestCase):
-
     def test_wav(self):
         actual = file_info.channels(INPUT_FILE)
         expected = 1
@@ -96,7 +92,6 @@ class TestChannels(unittest.TestCase):
 
 
 class TestComments(unittest.TestCase):
-
     def test_wav(self):
         actual = file_info.comments(INPUT_FILE)
         expected = ""
@@ -119,7 +114,6 @@ class TestComments(unittest.TestCase):
 
 
 class TestDuration(unittest.TestCase):
-
     def test_wav(self):
         actual = file_info.duration(INPUT_FILE)
         expected = 10.0
@@ -147,7 +141,6 @@ class TestDuration(unittest.TestCase):
 
 
 class TestEncoding(unittest.TestCase):
-
     def test_wav(self):
         actual = file_info.encoding(INPUT_FILE)
         expected = "Signed Integer PCM"
@@ -170,7 +163,6 @@ class TestEncoding(unittest.TestCase):
 
 
 class TestFileType(unittest.TestCase):
-
     def test_wav(self):
         actual = file_info.file_type(INPUT_FILE)
         expected = "wav"
@@ -193,7 +185,6 @@ class TestFileType(unittest.TestCase):
 
 
 class TestNumSamples(unittest.TestCase):
-
     def test_wav(self):
         actual = file_info.num_samples(INPUT_FILE)
         expected = 441000
@@ -216,7 +207,6 @@ class TestNumSamples(unittest.TestCase):
 
 
 class TestSampleRate(unittest.TestCase):
-
     def test_wav(self):
         actual = file_info.sample_rate(INPUT_FILE)
         expected = 44100
@@ -239,7 +229,6 @@ class TestSampleRate(unittest.TestCase):
 
 
 class TestSilent(unittest.TestCase):
-
     def test_nonsilent(self):
         actual = file_info.silent(INPUT_FILE)
         expected = False
@@ -262,45 +251,43 @@ class TestSilent(unittest.TestCase):
 
 
 class TestFileExtension(unittest.TestCase):
-
     def test_ext1(self):
-        actual = file_info.file_extension('simplefile.xyz')
-        expected = 'xyz'
+        actual = file_info.file_extension("simplefile.xyz")
+        expected = "xyz"
         self.assertEqual(expected, actual)
 
     def test_ext1_pathlib(self):
-        actual = file_info.file_extension(Path('simplefile.xyz'))
-        expected = 'xyz'
+        actual = file_info.file_extension(Path("simplefile.xyz"))
+        expected = "xyz"
         self.assertEqual(expected, actual)
 
     def test_ext2(self):
-        actual = file_info.file_extension('less.simple.file.xyz')
-        expected = 'xyz'
+        actual = file_info.file_extension("less.simple.file.xyz")
+        expected = "xyz"
         self.assertEqual(expected, actual)
 
     def test_ext3(self):
-        actual = file_info.file_extension('longext.asdf')
-        expected = 'asdf'
+        actual = file_info.file_extension("longext.asdf")
+        expected = "asdf"
         self.assertEqual(expected, actual)
 
     def test_ext4(self):
-        actual = file_info.file_extension('this/has/a/path/file.123')
-        expected = '123'
+        actual = file_info.file_extension("this/has/a/path/file.123")
+        expected = "123"
         self.assertEqual(expected, actual)
 
     def test_ext5(self):
-        actual = file_info.file_extension('this.is/a/weird.path/file.x23zya')
-        expected = 'x23zya'
+        actual = file_info.file_extension("this.is/a/weird.path/file.x23zya")
+        expected = "x23zya"
         self.assertEqual(expected, actual)
 
     def test_ext6(self):
-        actual = file_info.file_extension('simplefile.MP3')
-        expected = 'mp3'
+        actual = file_info.file_extension("simplefile.MP3")
+        expected = "mp3"
         self.assertEqual(expected, actual)
 
 
 class TestInfo(unittest.TestCase):
-
     def test_dictionary(self):
         for use_pathlib in [False, True]:
             with self.subTest():
@@ -308,20 +295,19 @@ class TestInfo(unittest.TestCase):
 
                 actual = file_info.info(input_file)
                 expected = {
-                    'channels': 1,
-                    'sample_rate': 44100.0,
-                    'bitdepth': 16,
-                    'bitrate': 706000.0,
-                    'duration': 10.0,
-                    'num_samples': 441000,
-                    'encoding': 'Signed Integer PCM',
-                    'silent': False
+                    "channels": 1,
+                    "sample_rate": 44100.0,
+                    "bitdepth": 16,
+                    "bitrate": 706000.0,
+                    "duration": 10.0,
+                    "num_samples": 441000,
+                    "encoding": "Signed Integer PCM",
+                    "silent": False,
                 }
                 self.assertEqual(expected, actual)
 
 
 class TestValidateInputFile(unittest.TestCase):
-
     def test_valid(self):
         actual = file_info.validate_input_file(INPUT_FILE)
         expected = None
@@ -339,7 +325,7 @@ class TestValidateInputFile(unittest.TestCase):
 
     def test_nonexistent(self):
         with self.assertRaises(IOError):
-            file_info.validate_input_file('data/asdfasdfasdf.wav')
+            file_info.validate_input_file("data/asdfasdfasdf.wav")
 
     def test_invalid_format(self):
         actual = file_info.validate_input_file(INPUT_FILE_INVALID)
@@ -348,7 +334,6 @@ class TestValidateInputFile(unittest.TestCase):
 
 
 class TestValidateInputFileList(unittest.TestCase):
-
     def test_valid(self):
         actual = file_info.validate_input_file_list([INPUT_FILE, INPUT_FILE])
         expected = None
@@ -368,20 +353,15 @@ class TestValidateInputFileList(unittest.TestCase):
 
     def test_nonexistent(self):
         with self.assertRaises(IOError):
-            file_info.validate_input_file_list(
-                ['data/asdfasdfasdf.wav', INPUT_FILE]
-            )
+            file_info.validate_input_file_list(["data/asdfasdfasdf.wav", INPUT_FILE])
 
     def test_invalid_format(self):
-        actual = file_info.validate_input_file_list(
-            [INPUT_FILE_INVALID, INPUT_FILE]
-        )
+        actual = file_info.validate_input_file_list([INPUT_FILE_INVALID, INPUT_FILE])
         expected = None
         self.assertEqual(expected, actual)
 
 
 class TestValidateOutputFile(unittest.TestCase):
-
     def test_valid(self):
         actual = file_info.validate_output_file(OUTPUT_FILE)
         expected = None
@@ -389,10 +369,10 @@ class TestValidateOutputFile(unittest.TestCase):
 
     def test_not_writeable(self):
         with self.assertRaises(IOError):
-            file_info.validate_output_file('notafolder/output.wav')
+            file_info.validate_output_file("notafolder/output.wav")
 
     def test_invalid_format(self):
-        actual = file_info.validate_output_file('output.xyz')
+        actual = file_info.validate_output_file("output.xyz")
         expected = None
         self.assertEqual(expected, actual)
 
@@ -403,92 +383,88 @@ class TestValidateOutputFile(unittest.TestCase):
 
 
 class TestStat(unittest.TestCase):
-
     def test_silent_file(self):
         expected = {
-            'Samples read': 627456,
-            'Length (seconds)': 14.228027,
-            'Scaled by': 2147483647.0,
-            'Maximum amplitude': 0.010895,
-            'Minimum amplitude': -0.004883,
-            'Midline amplitude': 0.003006,
-            'Mean    norm': 0.000137,
-            'Mean    amplitude': -0.000062,
-            'RMS     amplitude': 0.000200,
-            'Maximum delta': 0.015778,
-            'Minimum delta': 0.000000,
-            'Mean    delta': 0.000096,
-            'RMS     delta': 0.000124,
-            'Rough   frequency': 4349,
-            'Volume adjustment': 91.787
+            "Samples read": 627456,
+            "Length (seconds)": 14.228027,
+            "Scaled by": 2147483647.0,
+            "Maximum amplitude": 0.010895,
+            "Minimum amplitude": -0.004883,
+            "Midline amplitude": 0.003006,
+            "Mean    norm": 0.000137,
+            "Mean    amplitude": -0.000062,
+            "RMS     amplitude": 0.000200,
+            "Maximum delta": 0.015778,
+            "Minimum delta": 0.000000,
+            "Mean    delta": 0.000096,
+            "RMS     delta": 0.000124,
+            "Rough   frequency": 4349,
+            "Volume adjustment": 91.787,
         }
         actual = file_info.stat(SILENT_FILE)
         self.assertEqual(expected, actual)
 
 
 class TestStatCall(unittest.TestCase):
-
     def test_stat_call(self):
-        expected = ('Samples read:            627456\nLength (seconds):'
-                    '     14.228027\nScaled by:         2147483647.0\nMax'
-                    'imum amplitude:     0.010895\nMinimum amplitude:    '
-                    '-0.004883\nMidline amplitude:     0.003006\nMean    '
-                    'norm:          0.000137\nMean    amplitude:    -0.000'
-                    '062\nRMS     amplitude:     0.000200\nMaximum delta:  '
-                    '       0.015778\nMinimum delta:         0.000000\nMean'
-                    '    delta:         0.000096\nRMS     delta:         '
-                    '0.000124\nRough   frequency:         4349\nVolume '
-                    'adjustment:       91.787\n')
+        expected = (
+            "Samples read:            627456\nLength (seconds):"
+            "     14.228027\nScaled by:         2147483647.0\nMax"
+            "imum amplitude:     0.010895\nMinimum amplitude:    "
+            "-0.004883\nMidline amplitude:     0.003006\nMean    "
+            "norm:          0.000137\nMean    amplitude:    -0.000"
+            "062\nRMS     amplitude:     0.000200\nMaximum delta:  "
+            "       0.015778\nMinimum delta:         0.000000\nMean"
+            "    delta:         0.000096\nRMS     delta:         "
+            "0.000124\nRough   frequency:         4349\nVolume "
+            "adjustment:       91.787\n"
+        )
         actual = file_info._stat_call(SILENT_FILE)
         self.assertEqual(expected, actual)
 
 
 class TestParseStat(unittest.TestCase):
-
     def test_empty(self):
-        stat_output = ''
+        stat_output = ""
         expected = {}
         actual = file_info._parse_stat(stat_output)
         self.assertEqual(expected, actual)
 
     def test_simple(self):
-        stat_output = 'Blorg: 1.2345\nPlombus:   -0.0001\nMrs.   Pancakes: a'
-        expected = {
-            'Blorg': 1.2345,
-            'Plombus': -0.0001,
-            'Mrs.   Pancakes': None
-        }
+        stat_output = "Blorg: 1.2345\nPlombus:   -0.0001\nMrs.   Pancakes: a"
+        expected = {"Blorg": 1.2345, "Plombus": -0.0001, "Mrs.   Pancakes": None}
         actual = file_info._parse_stat(stat_output)
         self.assertEqual(expected, actual)
 
     def test_real_output(self):
-        stat_output = ('Samples read:            627456\nLength (seconds):'
-                       '     14.228027\nScaled by:         2147483647.0\nMax'
-                       'imum amplitude:     0.010895\nMinimum amplitude:    '
-                       '-0.004883\nMidline amplitude:     0.003006\nMean    '
-                       'norm:          0.000137\nMean    amplitude:    -0.000'
-                       '062\nRMS     amplitude:     0.000200\nMaximum delta:  '
-                       '       0.015778\nMinimum delta:         0.000000\nMean'
-                       '    delta:         0.000096\nRMS     delta:         '
-                       '0.000124\nRough   frequency:         4349\nVolume '
-                       'adjustment:       91.787\n')
+        stat_output = (
+            "Samples read:            627456\nLength (seconds):"
+            "     14.228027\nScaled by:         2147483647.0\nMax"
+            "imum amplitude:     0.010895\nMinimum amplitude:    "
+            "-0.004883\nMidline amplitude:     0.003006\nMean    "
+            "norm:          0.000137\nMean    amplitude:    -0.000"
+            "062\nRMS     amplitude:     0.000200\nMaximum delta:  "
+            "       0.015778\nMinimum delta:         0.000000\nMean"
+            "    delta:         0.000096\nRMS     delta:         "
+            "0.000124\nRough   frequency:         4349\nVolume "
+            "adjustment:       91.787\n"
+        )
         expected = {
-            'Samples read': 627456,
-            'Length (seconds)': 14.228027,
-            'Scaled by': 2147483647.0,
-            'Maximum amplitude': 0.010895,
-            'Minimum amplitude': -0.004883,
-            'Midline amplitude': 0.003006,
-            'Mean    norm': 0.000137,
-            'Mean    amplitude': -0.000062,
-            'RMS     amplitude': 0.000200,
-            'Maximum delta': 0.015778,
-            'Minimum delta': 0.000000,
-            'Mean    delta': 0.000096,
-            'RMS     delta': 0.000124,
-            'Rough   frequency': 4349,
-            'Volume adjustment': 91.787
+            "Samples read": 627456,
+            "Length (seconds)": 14.228027,
+            "Scaled by": 2147483647.0,
+            "Maximum amplitude": 0.010895,
+            "Minimum amplitude": -0.004883,
+            "Midline amplitude": 0.003006,
+            "Mean    norm": 0.000137,
+            "Mean    amplitude": -0.000062,
+            "RMS     amplitude": 0.000200,
+            "Maximum delta": 0.015778,
+            "Minimum delta": 0.000000,
+            "Mean    delta": 0.000096,
+            "RMS     delta": 0.000124,
+            "Rough   frequency": 4349,
+            "Volume adjustment": 91.787,
         }
         actual = file_info._parse_stat(stat_output)
         self.assertEqual(expected, actual)
-
