@@ -71,10 +71,10 @@ class Transformer:
         self.input_format = {}  # type: Dict
         self.output_format = {}  # type : Dict
 
-        self.effects = []  # type: List[str]
-        self.effects_log = []  # type: List[str]
+        self.effects = []  # type: list[str]
+        self.effects_log = []  # type: list[str]
 
-        self.globals = []  # type: List[str]
+        self.globals = []  # type: list[str]
         self.set_globals()
 
     def set_globals(
@@ -1380,7 +1380,7 @@ class Transformer:
         attack_time: float = 0.3,
         decay_time: float = 0.8,
         soft_knee_db: float = 6.0,
-        tf_points: List[Tuple[float, float]] = [(-70, -70), (-60, -20), (0, 0)],
+        tf_points: list[Tuple[float, float]] = [(-70, -70), (-60, -20), (0, 0)],
     ):
         """Compand (compress or expand) the dynamic range of the audio.
 
@@ -2186,12 +2186,12 @@ class Transformer:
         crossover_frequencies: list[float] = [1600],
         attack_time: list[float] = [0.005, 0.000625],
         decay_time: list[float] = [0.1, 0.0125],
-        soft_knee_db: List[float | None] = [6.0, None],
-        tf_points: List[List[Tuple[float, float]]] = [
+        soft_knee_db: list[float | None] = [6.0, None],
+        tf_points: list[list[Tuple[float, float]]] = [
             [(-47, -40), (-34, -34), (-17, -33), (0, 0)],
             [(-47, -40), (-34, -34), (-15, -33), (0, 0)],
         ],
-        gain: List[float | None] = [None, None],
+        gain: list[float | None] = [None, None],
     ):
         """The multi-band compander is similar to the single-band compander but
         the audio is first divided into bands using Linkwitz-Riley cross-over

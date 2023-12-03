@@ -8,7 +8,7 @@ This module requires that SoX is installed.
 from __future__ import print_function
 
 from pathlib import Path
-from typing import List, Optional, Union
+from typing import List
 
 from typing_extensions import Literal
 
@@ -125,7 +125,7 @@ class Combiner(Transformer):
 
     def preview(
         self,
-        input_filepath_list: List[str | Path],
+        input_filepath_list: list[str | Path],
         combine_type: CombineType,
         input_volumes: list[float] | None = None,
     ):
@@ -171,10 +171,10 @@ class Combiner(Transformer):
         self,
         file_type: list[str] | None = None,
         rate: list[float] | None = None,
-        bits: Optional[List[int]] = None,
-        channels: Optional[List[int]] = None,
-        encoding: Optional[List[EncodingValue]] = None,
-        ignore_length: Optional[List[bool]] = None,
+        bits: list[int] | None = None,
+        channels: list[int] | None = None,
+        encoding: list[EncodingValue] | None = None,
+        ignore_length: list[bool] | None = None,
     ):
         """Sets input file format arguments. This is primarily useful when
         dealing with audio files without a file extension. Overwrites any
@@ -336,7 +336,7 @@ class Combiner(Transformer):
 
 
 def _validate_file_formats(
-    input_filepath_list: List[str | Path], combine_type: CombineType
+    input_filepath_list: list[str | Path], combine_type: CombineType
 ):
     """Validate that combine method can be performed with given files.
     Raises IOError if input file formats are incompatible.
@@ -347,7 +347,7 @@ def _validate_file_formats(
         _validate_num_channels(input_filepath_list, combine_type)
 
 
-def _validate_sample_rates(input_filepath_list: List[Path], combine_type: CombineType):
+def _validate_sample_rates(input_filepath_list: list[Path], combine_type: CombineType):
     """Check if files in input file list have the same sample rate"""
     sample_rates = [file_info.sample_rate(f) for f in input_filepath_list]
     if not core.all_equal(sample_rates):
@@ -359,7 +359,7 @@ def _validate_sample_rates(input_filepath_list: List[Path], combine_type: Combin
         )
 
 
-def _validate_num_channels(input_filepath_list: List[Path], combine_type: CombineType):
+def _validate_num_channels(input_filepath_list: list[Path], combine_type: CombineType):
     """Check if files in input file list have the same number of channels"""
     channels = [file_info.channels(f) for f in input_filepath_list]
     if not core.all_equal(channels):
@@ -371,10 +371,10 @@ def _validate_num_channels(input_filepath_list: List[Path], combine_type: Combin
 
 
 def _build_input_format_list(
-    input_filepath_list: List[Path],
+    input_filepath_list: list[Path],
     input_volumes: list[float] | None = None,
-    input_format: Optional[List[List[str]]] = None,
-) -> List[str]:
+    input_format: list[list[str]] | None = None,
+) -> list[str]:
     """Set input formats given input_volumes.
 
     Parameters
@@ -457,8 +457,8 @@ def _build_input_format_list(
 
 
 def _build_input_args(
-    input_filepath_list: List[Path], input_format_list: List[str]
-) -> List[str]:
+    input_filepath_list: list[Path], input_format_list: list[str]
+) -> list[str]:
     """Builds input arguments by stitching input filepaths and input
     formats together.
     """
@@ -478,7 +478,7 @@ def _build_input_args(
     return input_args
 
 
-def _validate_combine_type(combine_type: List[CombineType]):
+def _validate_combine_type(combine_type: list[CombineType]):
     """Check that the combine_type is valid.
 
     Parameters

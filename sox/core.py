@@ -124,7 +124,7 @@ class SoxError(Exception):
         Exception.__init__(self, *args, **kwargs)
 
 
-def _get_valid_formats() -> List[str]:
+def _get_valid_formats() -> list[str]:
     """Calls SoX help for a lists of audio formats available with the current
     install of SoX.
 
@@ -259,7 +259,7 @@ def is_number(var: Any) -> bool:
         return False
 
 
-def all_equal(list_of_things: List[Any]) -> bool:
+def all_equal(list_of_things: list[Any]) -> bool:
     """Check if a list contains identical elements.
 
     Parameters

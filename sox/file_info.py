@@ -259,7 +259,7 @@ def validate_input_file(input_filepath: str | Path) -> None:
         logger.warning(f"This install of SoX cannot process .{ext} files.")
 
 
-def validate_input_file_list(input_filepath_list: List[str | Path]) -> None:
+def validate_input_file_list(input_filepath_list: list[str | Path]) -> None:
     """Input file list validation function. Checks that object is a list and
     contains valid filepaths that can be processed by SoX.
 
