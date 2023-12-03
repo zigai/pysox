@@ -45,8 +45,8 @@ class Combiner(Transformer):
 
     def build(
         self,
-        input_filepath_list: Union[str, Path],
-        output_filepath: Union[str, Path],
+        input_filepath_list: str | Path,
+        output_filepath: str | Path,
         combine_type: CombineType,
         input_volumes: Optional[List[float]] = None,
     ):
@@ -125,7 +125,7 @@ class Combiner(Transformer):
 
     def preview(
         self,
-        input_filepath_list: List[Union[str, Path]],
+        input_filepath_list: List[str | Path],
         combine_type: CombineType,
         input_volumes: Optional[List[float]] = None,
     ):
@@ -336,7 +336,7 @@ class Combiner(Transformer):
 
 
 def _validate_file_formats(
-    input_filepath_list: List[Union[str, Path]], combine_type: CombineType
+    input_filepath_list: List[str | Path], combine_type: CombineType
 ):
     """Validate that combine method can be performed with given files.
     Raises IOError if input file formats are incompatible.

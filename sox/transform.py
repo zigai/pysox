@@ -537,8 +537,8 @@ class Transformer:
 
     def build(
         self,
-        input_filepath: Optional[Union[str, Path]] = None,
-        output_filepath: Optional[Union[str, Path]] = None,
+        input_filepath: Optional[str | Path] = None,
+        output_filepath: Optional[str | Path] = None,
         input_array: Optional[str] = None,
         sample_rate_in: Optional[float] = None,
         extra_args: Optional[List[str]] = None,
@@ -653,8 +653,8 @@ class Transformer:
 
     def build_file(
         self,
-        input_filepath: Optional[Union[str, Path]] = None,
-        output_filepath: Optional[Union[str, Path]] = None,
+        input_filepath: Optional[str | Path] = None,
+        output_filepath: Optional[str | Path] = None,
         input_array: Optional[np.ndarray] = None,
         sample_rate_in: Optional[float] = None,
         extra_args: Optional[List[str]] = None,
@@ -741,7 +741,7 @@ class Transformer:
 
     def build_array(
         self,
-        input_filepath: Optional[Union[str, Path]] = None,
+        input_filepath: Optional[str | Path] = None,
         input_array: Optional[np.ndarray] = None,
         sample_rate_in: Optional[float] = None,
         extra_args: Optional[List[str]] = None,
@@ -888,7 +888,7 @@ class Transformer:
 
         return out
 
-    def preview(self, input_filepath: Union[str, Path]):
+    def preview(self, input_filepath: str | Path):
         """Play a preview of the output with the current set of effects
 
         Parameters
@@ -2331,9 +2331,7 @@ class Transformer:
         self.effects_log.append("mcompand")
         return self
 
-    def noiseprof(
-        self, input_filepath: Union[str, Path], profile_path: Union[str, Path]
-    ):
+    def noiseprof(self, input_filepath: str | Path, profile_path: str | Path):
         """Calculate a profile of the audio for use in noise reduction.
         Running this command does not effect the Transformer effects
         chain. When this function is called, the calculated noise profile
@@ -2367,7 +2365,7 @@ class Transformer:
 
         return None
 
-    def noisered(self, profile_path: Union[str, Path], amount: float = 0.5):
+    def noisered(self, profile_path: str | Path, amount: float = 0.5):
         """Reduce noise in the audio signal by profiling and filtering.
         This effect is moderately effective at removing consistent
         background noise such as hiss or hum.
@@ -3084,7 +3082,7 @@ class Transformer:
 
     def stat(
         self,
-        input_filepath: Union[str, Path],
+        input_filepath: str | Path,
         scale: Optional[float] = None,
         rms: Optional[bool] = False,
     ):
@@ -3140,7 +3138,7 @@ class Transformer:
 
         return stat_dict
 
-    def power_spectrum(self, input_filepath: Union[str, Path]):
+    def power_spectrum(self, input_filepath: str | Path):
         """Calculates the power spectrum (4096 point DFT). This method
         internally invokes the stat command with the -freq option.
 
@@ -3178,7 +3176,7 @@ class Transformer:
 
         return power_spectrum
 
-    def stats(self, input_filepath: Union[str, Path]):
+    def stats(self, input_filepath: str | Path):
         """Display time domain statistical information about the audio
         channels. Audio is passed unmodified through the SoX processing chain.
         Statistics are calculated and displayed for each audio channel

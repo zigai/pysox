@@ -250,8 +250,8 @@ def validate_input_file(input_filepath: str | Path) -> None:
         raise IOError("input_filepath {} does not exist.".format(input_filepath))
     ext = file_extension(input_filepath)
     if ext not in VALID_FORMATS:
-        logger.info("Valid formats: %s", " ".join(VALID_FORMATS))
-        logger.warning("This install of SoX cannot process .{} files.".format(ext))
+        logger.info(f"Valid formats: {' '.join(VALID_FORMATS)}")
+        logger.warning(f"This install of SoX cannot process .{ext} files.")
 
 
 def validate_input_file_list(input_filepath_list: List[str | Path]) -> None:

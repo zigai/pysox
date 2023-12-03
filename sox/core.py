@@ -1,6 +1,7 @@
 """Base module for calling SoX """
 
 import subprocess
+import time
 from pathlib import Path
 from subprocess import CalledProcessError
 from typing import Any, Iterable, List, Optional, Tuple, Union
@@ -41,7 +42,7 @@ def sox(
     args: Iterable[str],
     src_array: Optional[np.ndarray] = None,
     decode_out_with_utf: bool = True,
-) -> Tuple[bool, Optional[Union[str, np.ndarray]], Optional[str]]:
+) -> Tuple[int, str | np.ndarray | None, str | None]:
     """Pass an argument list to SoX.
 
     Parameters
@@ -77,19 +78,15 @@ def sox(
         args[0] = "sox"
 
     try:
-        logger.info("Executing: %s", " ".join(args))
-
+        logger.info(f"Executing: '{' '.join(args)}'")
+        start_time = time.time()
         if src_array is None:
             process_handle = subprocess.Popen(
                 args, stdout=subprocess.PIPE, stderr=subprocess.PIPE
             )
 
             out, err = process_handle.communicate()
-            if decode_out_with_utf:
-                out = out.decode("utf-8")
-            err = err.decode("utf-8")
-
-            status = process_handle.returncode
+            returncode = process_handle.returncode
         elif isinstance(src_array, np.ndarray):
             process_handle = subprocess.Popen(
                 args,
@@ -101,17 +98,24 @@ def sox(
             # sox expects. When we reshape stdout later, we need to use the same
             # order, otherwise tests fail.
             out, err = process_handle.communicate(src_array.T.tobytes(order="F"))
-            err = err.decode("utf-8")
-            status = process_handle.returncode
+            returncode = process_handle.returncode
         else:
-            raise TypeError("src_array must be an np.ndarray!")
+            raise TypeError(f"'src_array' must be an np.ndarray! ({type(src_array)})")
 
-        return status, out, err
+        time_taken = time.time() - start_time
+        logger.info(f"SoX took {time_taken:.2f} seconds")
+
+        err = err.decode("utf-8")
+        if decode_out_with_utf:
+            out = out.decode("utf-8")
+        else:
+            out = out.decode()
+        return returncode, out, err
 
     except OSError as error_msg:
-        logger.error("OSError: SoX failed! %s", error_msg)
+        logger.error("SoX failed!", error=error_msg)
     except TypeError as error_msg:
-        logger.error("TypeError: %s", error_msg)
+        logger.error("SoX failed!", error=error_msg)
     return 1, None, None
 
 
@@ -148,7 +152,7 @@ def _get_valid_formats() -> List[str]:
 VALID_FORMATS = _get_valid_formats()
 
 
-def soxi(filepath: Union[str, Path], argument: str) -> str:
+def soxi(filepath: str | Path, argument: str) -> str:
     """Base call to SoXI.
 
     Parameters
