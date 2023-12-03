@@ -4,7 +4,7 @@ import subprocess
 import time
 from pathlib import Path
 from subprocess import CalledProcessError
-from typing import Any, Iterable, List, Optional, Tuple, Union
+from typing import Any, Iterable, List, Tuple
 
 import numpy as np
 from typing_extensions import Literal
@@ -40,7 +40,7 @@ EncodingValue = Literal[
 
 def sox(
     args: Iterable[str],
-    src_array: Optional[np.ndarray] = None,
+    src_array: np.ndarray | None = None,
     decode_out_with_utf: bool = True,
 ) -> Tuple[int, str | np.ndarray | None, str | None]:
     """Pass an argument list to SoX.

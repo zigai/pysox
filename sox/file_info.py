@@ -3,13 +3,13 @@
 import os
 from numbers import Number
 from pathlib import Path
-from typing import Dict, List, Optional, Union
+from typing import Dict, List
 
 from .core import VALID_FORMATS, sox, soxi
 from .log import logger
 
 
-def bitdepth(input_filepath: str | Path) -> Optional[int]:
+def bitdepth(input_filepath: str | Path) -> int | None:
     """
     Number of bits per sample, or None if not applicable.
 
@@ -33,7 +33,7 @@ def bitdepth(input_filepath: str | Path) -> Optional[int]:
     return int(output)
 
 
-def bitrate(input_filepath: str | Path) -> Optional[float]:
+def bitrate(input_filepath: str | Path) -> float | None:
     """
     Bit rate averaged over the whole file.
     Expressed in bytes per second (bps), or None if not applicable.
@@ -104,7 +104,7 @@ def comments(input_filepath: str | Path) -> str:
     return str(output)
 
 
-def duration(input_filepath: str | Path) -> Optional[float]:
+def duration(input_filepath: str | Path) -> float | None:
     """
     Show duration in seconds, or None if not available.
 
@@ -165,7 +165,7 @@ def file_type(input_filepath: str | Path) -> str:
     return str(output)
 
 
-def num_samples(input_filepath: str | Path) -> Optional[int]:
+def num_samples(input_filepath: str | Path) -> int | None:
     """
     Show number of samples, or None if unavailable.
 
@@ -331,7 +331,7 @@ def file_extension(filepath: str | Path) -> str:
     return Path(filepath).suffix[1:].lower()
 
 
-def info(filepath: str | Path) -> Dict[str, Union[str, Number]]:
+def info(filepath: str | Path) -> Dict[str, str | Number]:
     """Get a dictionary of file information
 
     Parameters
@@ -365,7 +365,7 @@ def info(filepath: str | Path) -> Dict[str, Union[str, Number]]:
     return info_dictionary
 
 
-def stat(filepath: str | Path) -> Dict[str, Optional[float]]:
+def stat(filepath: str | Path) -> Dict[str, float | None]:
     """Returns a dictionary of audio statistics.
 
     Parameters
@@ -404,7 +404,7 @@ def _stat_call(filepath: str | Path) -> str:
     return stat_output
 
 
-def _parse_stat(stat_output: str) -> Dict[str, Optional[float]]:
+def _parse_stat(stat_output: str) -> Dict[str, float | None]:
     """Parse the string output from sox's stat function
 
     Parameters

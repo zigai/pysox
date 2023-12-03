@@ -10,7 +10,7 @@ from __future__ import print_function
 import os
 import random
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Tuple
 
 import numpy as np
 from typing_extensions import Literal
@@ -226,11 +226,11 @@ class Transformer:
 
     def set_input_format(
         self,
-        file_type: Optional[str] = None,
-        rate: Optional[float] = None,
-        bits: Optional[int] = None,
-        channels: Optional[int] = None,
-        encoding: Optional[EncodingValue] = None,
+        file_type: str | None = None,
+        rate: float | None = None,
+        bits: int | None = None,
+        channels: int | None = None,
+        encoding: EncodingValue | None = None,
         ignore_length: bool = False,
     ):
         """Sets input file format arguments. This is primarily useful when
@@ -306,7 +306,7 @@ class Transformer:
         self._validate_input_format(input_format)
         self.input_format = input_format
 
-    def _validate_output_format(self, output_format):
+    def _validate_output_format(self, output_format: dict):
         """Private helper function for validating input formats"""
         file_type = output_format.get("file_type")
         rate = output_format.get("rate")
@@ -315,6 +315,7 @@ class Transformer:
         encoding = output_format.get("encoding")
         comments = output_format.get("comments")
         append_comments = output_format.get("append_comments", True)
+        bitrate = output_format.get("bitrate")
 
         if file_type not in VALID_FORMATS + [None]:
             raise ValueError(
@@ -350,7 +351,11 @@ class Transformer:
         if not isinstance(append_comments, bool):
             raise ValueError("append_comments must be a boolean")
 
-    def _output_format_args(self, output_format):
+        if bitrate is not None:
+            if bitrate <= 0:
+                raise ValueError("bitrate must be a positive number")
+
+    def _output_format_args(self, output_format: dict) -> list[str]:
         """Private helper function for set_output_format"""
         self._validate_output_format(output_format)
 
@@ -361,6 +366,7 @@ class Transformer:
         encoding = output_format.get("encoding")
         comments = output_format.get("comments")
         append_comments = output_format.get("append_comments", True)
+        bitrate = output_format.get("bitrate")
 
         output_format_args = []
 
@@ -385,16 +391,20 @@ class Transformer:
             else:
                 output_format_args.extend(["--comment", comments])
 
+        if bitrate is not None:
+            output_format_args.extend(["-C", "{}".format(bitrate)])
+
         return output_format_args
 
     def set_output_format(
         self,
-        file_type: Optional[str] = None,
-        rate: Optional[float] = None,
-        bits: Optional[int] = None,
-        channels: Optional[int] = None,
-        encoding: Optional[EncodingValue] = None,
-        comments: Optional[str] = None,
+        file_type: str | None = None,
+        rate: float | None = None,
+        bitrate: float | None = None,
+        bits: int | None = None,
+        channels: int | None = None,
+        encoding: EncodingValue | None = None,
+        comments: str | None = None,
         append_comments: bool = True,
     ):
         """Sets output file format arguments. These arguments will overwrite
@@ -468,6 +478,7 @@ class Transformer:
             "encoding": encoding,
             "comments": comments,
             "append_comments": append_comments,
+            "bitrate": bitrate,
         }
         self._validate_output_format(output_format)
         self.output_format = output_format
@@ -530,11 +541,11 @@ class Transformer:
 
     def build(
         self,
-        input_filepath: Optional[str | Path] = None,
-        output_filepath: Optional[str | Path] = None,
-        input_array: Optional[str] = None,
-        sample_rate_in: Optional[float] = None,
-        extra_args: Optional[List[str]] = None,
+        input_filepath: str | Path | None = None,
+        output_filepath: str | Path | None = None,
+        input_array: str | None = None,
+        sample_rate_in: float | None = None,
+        extra_args: list[str] | None = None,
         return_output: bool = False,
     ):
         """Given an input file or array, creates an output_file on disk by
@@ -646,11 +657,11 @@ class Transformer:
 
     def build_file(
         self,
-        input_filepath: Optional[str | Path] = None,
-        output_filepath: Optional[str | Path] = None,
-        input_array: Optional[np.ndarray] = None,
-        sample_rate_in: Optional[float] = None,
-        extra_args: Optional[List[str]] = None,
+        input_filepath: str | Path | None = None,
+        output_filepath: str | Path | None = None,
+        input_array: np.ndarray | None = None,
+        sample_rate_in: float | None = None,
+        extra_args: list[str] | None = None,
         return_output: bool = False,
     ):
         """An alias for build.
@@ -734,10 +745,10 @@ class Transformer:
 
     def build_array(
         self,
-        input_filepath: Optional[str | Path] = None,
-        input_array: Optional[np.ndarray] = None,
-        sample_rate_in: Optional[float] = None,
-        extra_args: Optional[List[str]] = None,
+        input_filepath: str | Path | None = None,
+        input_array: np.ndarray | None = None,
+        sample_rate_in: float | None = None,
+        extra_args: list[str] | None = None,
     ):
         """Given an input file or array, returns the ouput as a numpy array
         by executing the current set of commands. By default the array will
@@ -1061,9 +1072,9 @@ class Transformer:
     def bend(
         self,
         n_bends: int,
-        start_times: List[float],
-        end_times: List[float],
-        cents: List[float],
+        start_times: list[float],
+        end_times: list[float],
+        cents: list[float],
         frame_rate: int = 25,
         oversample_rate: int = 16,
     ):
@@ -1157,7 +1168,7 @@ class Transformer:
         self.effects_log.append("bend")
         return self
 
-    def biquad(self, b: List[float], a: List[float]):
+    def biquad(self, b: list[float], a: list[float]):
         """Apply a biquad IIR filter with the given coefficients.
 
         Parameters
@@ -1235,11 +1246,11 @@ class Transformer:
         gain_in: float = 0.5,
         gain_out: float = 0.9,
         n_voices: int = 3,
-        delays: Optional[List[float]] = None,
-        decays: Optional[List[float]] = None,
-        speeds: Optional[List[float]] = None,
-        depths: Optional[List[float]] = None,
-        shapes: Optional[List[Literal["s", "t"]]] = None,
+        delays: list[float] | None = None,
+        decays: list[float] | None = None,
+        speeds: list[float] | None = None,
+        depths: list[float] | None = None,
+        shapes: list[Literal["s", "t"]] | None = None,
     ):
         """Add a chorus effect to the audio. This can makeasingle vocal sound
         like a chorus, but can also be applied to instrumentation.
@@ -1466,9 +1477,9 @@ class Transformer:
 
     def convert(
         self,
-        samplerate: Optional[float] = None,
-        n_channels: Optional[int] = None,
-        bitdepth: Optional[int] = None,
+        samplerate: float | None = None,
+        n_channels: int | None = None,
+        bitdepth: int | None = None,
     ):
         """Converts output audio to the specified format.
 
@@ -1548,7 +1559,7 @@ class Transformer:
         self.effects_log.append("deemph")
         return self
 
-    def delay(self, positions: List[float]):
+    def delay(self, positions: list[float]):
         """Delay one or more audio channels such that they start at the given
         positions.
 
@@ -1622,8 +1633,8 @@ class Transformer:
         gain_in: float = 0.8,
         gain_out: float = 0.9,
         n_echos: int = 1,
-        delays: List[float] = [60],
-        decays: List[float] = [0.4],
+        delays: list[float] = [60],
+        decays: list[float] = [0.4],
     ):
         """Add echoing to the audio.
 
@@ -1694,8 +1705,8 @@ class Transformer:
         gain_in: float = 0.8,
         gain_out: float = 0.9,
         n_echos: int = 1,
-        delays: List[float] = [60],
-        decays: List[float] = [0.4],
+        delays: list[float] = [60],
+        decays: list[float] = [0.4],
     ):
         """Add a sequence of echoes to the audio.
 
@@ -1861,7 +1872,7 @@ class Transformer:
 
         return self
 
-    def fir(self, coefficients: List[float]):
+    def fir(self, coefficients: list[float]):
         """Use SoX’s FFT convolution engine with given FIR filter coefficients.
 
         Parameters
@@ -1960,7 +1971,7 @@ class Transformer:
         gain_db: float = 0.0,
         normalize: bool = True,
         limiter: bool = False,
-        balance: Optional[Literal["e", "B", "b"]] = None,
+        balance: Literal["e", "B", "b"] | None = None,
     ):
         """Apply amplification or attenuation to the audio signal.
 
@@ -2099,7 +2110,7 @@ class Transformer:
 
         return self
 
-    def hilbert(self, num_taps: Optional[int] = None):
+    def hilbert(self, num_taps: int | None = None):
         """Apply an odd-tap Hilbert transform filter, phase-shifting the signal
         by 90 degrees. This is used in many matrix coding schemes and for
         analytic signal generation. The process is often written as a
@@ -2172,15 +2183,15 @@ class Transformer:
     def mcompand(
         self,
         n_bands: int = 2,
-        crossover_frequencies: List[float] = [1600],
-        attack_time: List[float] = [0.005, 0.000625],
-        decay_time: List[float] = [0.1, 0.0125],
-        soft_knee_db: List[Optional[float]] = [6.0, None],
+        crossover_frequencies: list[float] = [1600],
+        attack_time: list[float] = [0.005, 0.000625],
+        decay_time: list[float] = [0.1, 0.0125],
+        soft_knee_db: List[float | None] = [6.0, None],
         tf_points: List[List[Tuple[float, float]]] = [
             [(-47, -40), (-34, -34), (-17, -33), (0, 0)],
             [(-47, -40), (-34, -34), (-15, -33), (0, 0)],
         ],
-        gain: List[Optional[float]] = [None, None],
+        gain: List[float | None] = [None, None],
     ):
         """The multi-band compander is similar to the single-band compander but
         the audio is first divided into bands using Linkwitz-Riley cross-over
@@ -2595,7 +2606,11 @@ class Transformer:
 
         return self
 
-    def rate(self, samplerate: float, quality: Literal["q", "l", "m", "h", "v"] = "h"):
+    def rate(
+        self,
+        samplerate: float | None = None,
+        quality: Literal["q", "l", "m", "h", "v"] = "h",
+    ):
         """Change the audio sampling rate (i.e. resample the audio) to any
         given `samplerate`. Better the resampling quality = slower runtime.
 
@@ -2617,15 +2632,18 @@ class Transformer:
 
         """
         quality_vals = ["q", "l", "m", "h", "v"]
-        if not is_number(samplerate) or samplerate <= 0:
-            raise ValueError("Samplerate must be a positive number.")
+        if samplerate is not None:
+            if not is_number(samplerate) or samplerate <= 0:
+                raise ValueError("Samplerate must be a positive number.")
 
         if quality not in quality_vals:
             raise ValueError(
                 "Quality must be one of {}.".format(" ".join(quality_vals))
             )
+        effect_args = ["rate", f"-{quality}"]
+        if samplerate is not None:
+            effect_args.append(str(samplerate))
 
-        effect_args = ["rate", "-{}".format(quality), "{:f}".format(samplerate)]
         self.effects.extend(effect_args)
         self.effects_log.append("rate")
 
@@ -2633,8 +2651,8 @@ class Transformer:
 
     def remix(
         self,
-        remix_dictionary: Optional[Dict[int, List[int]]] = None,
-        num_output_channels: Optional[int] = None,
+        remix_dictionary: dict[int, list[int]] | None = None,
+        num_output_channels: int | None = None,
     ):
         """Remix the channels of an audio file.
 
@@ -2899,10 +2917,10 @@ class Transformer:
     def sinc(
         self,
         filter_type: Literal["high", "low", "pass", "reject"] = "high",
-        cutoff_freq: Union[float, List[float]] = 3000,
+        cutoff_freq: float | list[float] = 3000,
         stop_band_attenuation: float = 120,
-        transition_bw: Optional[Union[float, List[float]]] = None,
-        phase_response: Optional[float] = None,
+        transition_bw: float | list[float] | None = None,
+        phase_response: float | None = None,
     ):
         """Apply a sinc kaiser-windowed low-pass, high-pass, band-pass, or
         band-reject filter to the signal.
@@ -3076,8 +3094,8 @@ class Transformer:
     def stat(
         self,
         input_filepath: str | Path,
-        scale: Optional[float] = None,
-        rms: Optional[bool] = False,
+        scale: float | None = None,
+        rms: bool = False,
     ):
         """Display time and frequency domain statistical information about the
         audio. Audio is passed unmodified through the SoX processing chain.
@@ -3279,7 +3297,7 @@ class Transformer:
     def tempo(
         self,
         factor: float,
-        audio_type: Optional[Literal["m", "s", "l"]] = None,
+        audio_type: Literal["m", "s", "l"] | None = None,
         quick: bool = False,
     ):
         """Time stretch audio without changing pitch.
@@ -3423,7 +3441,7 @@ class Transformer:
 
         return self
 
-    def trim(self, start_time: float, end_time: Optional[float] = None):
+    def trim(self, start_time: float, end_time: float | None = None):
         """Excerpt a clip from an audio file, given the start timestamp and end timestamp of the clip within the file, expressed in seconds. If the end timestamp is set to `None` or left unspecified, it defaults to the duration of the audio file.
 
         Parameters
@@ -3589,7 +3607,7 @@ class Transformer:
         self,
         gain: float,
         gain_type: Literal["amplitude", "power", "db"] = "amplitude",
-        limiter_gain: Optional[float] = None,
+        limiter_gain: float | None = None,
     ):
         """Apply an amplification or an attenuation to the audio signal.
 

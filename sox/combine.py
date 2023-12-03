@@ -48,7 +48,7 @@ class Combiner(Transformer):
         input_filepath_list: str | Path,
         output_filepath: str | Path,
         combine_type: CombineType,
-        input_volumes: Optional[List[float]] = None,
+        input_volumes: list[float] | None = None,
     ):
         """Builds the output_file by executing the current set of commands.
 
@@ -127,7 +127,7 @@ class Combiner(Transformer):
         self,
         input_filepath_list: List[str | Path],
         combine_type: CombineType,
-        input_volumes: Optional[List[float]] = None,
+        input_volumes: list[float] | None = None,
     ):
         """Play a preview of the output with the current set of effects
 
@@ -169,8 +169,8 @@ class Combiner(Transformer):
 
     def set_input_format(
         self,
-        file_type: Optional[List[str]] = None,
-        rate: Optional[List[float]] = None,
+        file_type: list[str] | None = None,
+        rate: list[float] | None = None,
         bits: Optional[List[int]] = None,
         channels: Optional[List[int]] = None,
         encoding: Optional[List[EncodingValue]] = None,
@@ -372,7 +372,7 @@ def _validate_num_channels(input_filepath_list: List[Path], combine_type: Combin
 
 def _build_input_format_list(
     input_filepath_list: List[Path],
-    input_volumes: Optional[List[float]] = None,
+    input_volumes: list[float] | None = None,
     input_format: Optional[List[List[str]]] = None,
 ) -> List[str]:
     """Set input formats given input_volumes.
@@ -493,7 +493,7 @@ def _validate_combine_type(combine_type: List[CombineType]):
         )
 
 
-def _validate_volumes(input_volumes: List[float]):
+def _validate_volumes(input_volumes: list[float]):
     """Check input_volumes contains a valid list of volumes.
 
     Parameters
