@@ -3415,7 +3415,8 @@ class TestTransformerNoiseprof(unittest.TestCase):
         tfm = new_transformer()
         with self.assertRaises(IOError):
             tfm.noiseprof(INPUT_FILE, "/usr/noise.prof")
-
+    
+    @unittest.skipIf(os.name == 'nt', reason="Test only for Unix systems")
     def test_noise_prof_invalid_cwd(self):
         tfm = new_transformer()
         _cwd = os.getcwd()

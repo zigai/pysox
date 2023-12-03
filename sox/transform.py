@@ -16,15 +16,8 @@ import numpy as np
 from typing_extensions import Literal
 
 from . import file_info
-from .core import (
-    ENCODING_VALS,
-    VALID_FORMATS,
-    EncodingValue,
-    SoxError,
-    is_number,
-    play,
-    sox,
-)
+from .core import (ENCODING_VALS, VALID_FORMATS, EncodingValue, SoxError,
+                   is_number, play, sox)
 from .log import logger
 
 VERBOSITY_VALS = [0, 1, 2, 3, 4]
@@ -642,8 +635,8 @@ class Transformer:
         if status != 0:
             raise SoxError("Stdout: {}\nStderr: {}".format(out, err))
 
-        logger.info(
-            "Created %s with effects: %s", output_filepath, " ".join(self.effects_log)
+        logger.debug(
+            f"Created {output_filepath} with effects: {', '.join(self.effects_log)}"
         )
 
         if return_output:

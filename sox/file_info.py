@@ -51,14 +51,15 @@ def bitrate(input_filepath: str | Path) -> Optional[float]:
     """
 
     validate_input_file(input_filepath)
-    output = soxi(input_filepath, "B")
+    output = soxi(input_filepath, "B").strip("\r\n")
     # The characters below stand for kilo, Mega, Giga, etc.
-    greek_prefixes = "\0kMGTPEZY"
+    greek_prefixes = "\0KMGTPEZY"
+    suffix = output[-1].upper()
     if output == "0":
-        logger.warning("Bit rate unavailable for %s", input_filepath)
+        logger.warning(f"Bit rate unavailable for {input_filepath}")
         return None
-    elif output[-1] in greek_prefixes:
-        multiplier = 1000.0 ** (greek_prefixes.index(output[-1]))
+    elif suffix in greek_prefixes:
+        multiplier = 1000.0 ** (greek_prefixes.index(suffix))
         return float(output[:-1]) * multiplier
     else:
         return float(output[:-1])
@@ -225,7 +226,11 @@ def silent(input_filepath: str | Path, threshold: float = 0.001) -> bool:
     """
     validate_input_file(input_filepath)
     stat_dictionary = stat(input_filepath)
+    logger.info(stat_dictionary)
     mean_norm = stat_dictionary["Mean    norm"]
+    if mean_norm is None:
+        logger.warning(f"Mean norm unavailable for {input_filepath}")
+        return False
     if mean_norm is not float("nan"):
         if mean_norm >= threshold:
             return False
@@ -306,8 +311,7 @@ def validate_output_file(output_filepath: str | Path) -> None:
 
     if os.path.exists(output_filepath):
         logger.warning(
-            "output_file: %s already exists and will be overwritten on build",
-            output_filepath,
+            f"output_file: '{output_filepath}' already exists and will be overwritten on build",
         )
 
 
@@ -395,6 +399,8 @@ def _stat_call(filepath: str | Path) -> str:
     validate_input_file(filepath)
     args = ["sox", filepath, "-n", "stat"]
     _, _, stat_output = sox(args)
+    if stat_output is not None:
+        stat_output = stat_output.replace("\r", "")
     return stat_output
 
 

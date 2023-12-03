@@ -87,6 +87,8 @@ def sox(
 
             out, err = process_handle.communicate()
             returncode = process_handle.returncode
+            if decode_out_with_utf:
+                out = out.decode("utf-8")
         elif isinstance(src_array, np.ndarray):
             process_handle = subprocess.Popen(
                 args,
@@ -106,10 +108,6 @@ def sox(
         logger.info(f"SoX took {time_taken:.2f} seconds")
 
         err = err.decode("utf-8")
-        if decode_out_with_utf:
-            out = out.decode("utf-8")
-        else:
-            out = out.decode()
         return returncode, out, err
 
     except OSError as error_msg:
@@ -185,7 +183,7 @@ def soxi(filepath: str | Path, argument: str) -> str:
 
     shell_output = shell_output.decode("utf-8")
 
-    return str(shell_output).strip("\n")
+    return str(shell_output).strip("\n\r")
 
 
 def play(args: Iterable[str]) -> bool:

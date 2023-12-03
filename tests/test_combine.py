@@ -10,12 +10,12 @@ def relpath(f):
     return os.path.join(os.path.dirname(__file__), f)
 
 
-INPUT_WAV = relpath("data/input.wav")
-INPUT_WAV2 = relpath("data/input2.wav")
-INPUT_WAV3 = relpath("data/input3.wav")
-INPUT_AIFF = relpath("data/input.aiff")
-INPUT_FILE_INVALID = relpath("data/input.xyz")
-OUTPUT_FILE = relpath("data/output.wav")
+INPUT_WAV = relpath(os.path.join("data", "input.wav"))
+INPUT_WAV2 = relpath(os.path.join("data", "input2.wav"))
+INPUT_WAV3 = relpath(os.path.join("data", "input3.wav"))
+INPUT_AIFF = relpath(os.path.join("data", "input.aiff"))
+INPUT_FILE_INVALID = relpath(os.path.join("data", "input.xyz"))
+OUTPUT_FILE = relpath(os.path.join("data", "output.wav"))
 
 
 def new_combiner():

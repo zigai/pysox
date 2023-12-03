@@ -418,8 +418,9 @@ class TestStatCall(unittest.TestCase):
             "    delta:         0.000096\nRMS     delta:         "
             "0.000124\nRough   frequency:         4349\nVolume "
             "adjustment:       91.787\n"
-        )
+        ).split("\n")
         actual = file_info._stat_call(SILENT_FILE)
+        actual = actual.split("\n")
         self.assertEqual(expected, actual)
 
 
