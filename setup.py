@@ -23,7 +23,11 @@ if __name__ == "__main__":
         long_description_content_type="text/markdown",
         keywords="audio effects SoX",
         license="BSD-3-Clause",
-        install_requires=["numpy >= 1.9.0", "typing-extensions >=  3.7.4.2 "],
+        install_requires=[
+            "numpy >= 1.9.0",
+            "typing-extensions >=  3.7.4.2 ",
+            "stdl>=0.5.1",
+        ],
         extras_require={
             "tests": [
                 "pytest",
