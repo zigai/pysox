@@ -3415,8 +3415,8 @@ class TestTransformerNoiseprof(unittest.TestCase):
         tfm = new_transformer()
         with self.assertRaises(IOError):
             tfm.noiseprof(INPUT_FILE, "/usr/noise.prof")
-    
-    @unittest.skipIf(os.name == 'nt', reason="Test only for Unix systems")
+
+    @unittest.skipIf(os.name == "nt", reason="Test only for Unix systems")
     def test_noise_prof_invalid_cwd(self):
         tfm = new_transformer()
         _cwd = os.getcwd()
@@ -4385,7 +4385,7 @@ class TestTransformerSilence(unittest.TestCase):
 
     def test_location_beginning(self):
         tfm = new_transformer()
-        tfm.silence(location=1)
+        tfm.silence(location="beginning")
 
         actual_args = tfm.effects
         expected_args = ["silence", "1", "0.100000", "0.100000%"]
@@ -4398,7 +4398,7 @@ class TestTransformerSilence(unittest.TestCase):
 
     def test_location_end(self):
         tfm = new_transformer()
-        tfm.silence(location=-1)
+        tfm.silence(location="end")
 
         actual_args = tfm.effects
         expected_args = ["reverse", "silence", "1", "0.100000", "0.100000%", "reverse"]

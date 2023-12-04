@@ -10,7 +10,7 @@ from __future__ import print_function
 import os
 import random
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Dict, Tuple
 
 import numpy as np
 from typing_extensions import Literal
@@ -315,7 +315,7 @@ class Transformer:
         encoding = output_format.get("encoding")
         comments = output_format.get("comments")
         append_comments = output_format.get("append_comments", True)
-        bitrate = output_format.get("bitrate")
+        bitrate = output_format.get("bitrate", None)
 
         if file_type not in VALID_FORMATS + [None]:
             raise ValueError(
@@ -478,8 +478,9 @@ class Transformer:
             "encoding": encoding,
             "comments": comments,
             "append_comments": append_comments,
-            "bitrate": bitrate,
         }
+        if bitrate is not None:
+            output_format["bitrate"] = bitrate
         self._validate_output_format(output_format)
         self.output_format = output_format
 
@@ -2642,7 +2643,7 @@ class Transformer:
             )
         effect_args = ["rate", f"-{quality}"]
         if samplerate is not None:
-            effect_args.append(str(samplerate))
+            effect_args.append("{:f}".format(samplerate))
 
         self.effects.extend(effect_args)
         self.effects_log.append("rate")
@@ -2836,7 +2837,7 @@ class Transformer:
 
     def silence(
         self,
-        location: Literal[0, 1, -1] = 0,
+        location: Literal["beginning", "end", "throughout"] = "throughout",
         silence_threshold: float = 0.1,
         min_silence_duration: float = 0.1,
         buffer_around_silence: bool = False,
@@ -2846,10 +2847,10 @@ class Transformer:
         Parameters
         ----------
         location : int, default=0
-            Where to remove silence. One of:
-             * 0 to remove silence throughout the file (default),
-             * 1 to remove silence from the beginning,
-             * -1 to remove silence from the end,
+            Where to remove silence. One of: "beginning", "end", "throughout"
+             * 'throughout' to remove silence throughout the file (default),
+             * 'beginning' to remove silence from the beginning,
+             * 'end to remove silence from the end,
         silence_threshold : float, default=0.1
             Silence threshold as percentage of maximum sample amplitude.
             Must be between 0 and 100.
@@ -2865,8 +2866,16 @@ class Transformer:
         vad
 
         """
-        if location not in [-1, 0, 1]:
-            raise ValueError("location must be one of -1, 0, 1.")
+        location_map = {
+            "beginning": 1,
+            "throughout": 0,
+            "end": -1,
+        }
+        if location not in location_map:
+            raise ValueError(
+                "location must be one of 'beginning', 'end', 'throughout'."
+            )
+        location = location_map[location]
 
         if not is_number(silence_threshold) or silence_threshold < 0:
             raise ValueError("silence_threshold must be a number between 0 and 100")
@@ -3231,8 +3240,7 @@ class Transformer:
         return stats_dict
 
     def stretch(self, factor: float, window: float = 20):
-        """Change the audio duration (but not its pitch).
-        **Unless factor is close to 1, use the tempo effect instead.**
+        """Change the audio duration (but not its pitch). Unless factor is close to 1, use the tempo effect instead.
 
         This effect is broadly equivalent to the tempo effect with search set
         to zero, so in general, its results are comparatively poor; it is
