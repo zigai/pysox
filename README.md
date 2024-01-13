@@ -13,5 +13,5 @@ pip install .
 
 
 # What's different?
-- Better Windows compatability
+- Better Windows compatibility
 - Dropped support for Python 3.9 and below
