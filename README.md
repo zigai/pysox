@@ -15,3 +15,4 @@ pip install .
 # What's different?
 - Better Windows compatibility
 - Dropped support for Python 3.9 and below
+- Improved type hints

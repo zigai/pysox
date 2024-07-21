@@ -1,4 +1,5 @@
 """ Setup script for sox. """
+
 import imp
 
 from setuptools import setup
@@ -26,7 +27,7 @@ if __name__ == "__main__":
         install_requires=[
             "numpy >= 1.9.0",
             "typing-extensions >=  3.7.4.2 ",
-            "stdl>=0.5.1",
+            "stdl==0.5.4",
         ],
         extras_require={
             "tests": [
