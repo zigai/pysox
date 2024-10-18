@@ -27,7 +27,7 @@ if __name__ == "__main__":
         install_requires=[
             "numpy >= 1.9.0",
             "typing-extensions >=  3.7.4.2 ",
-            "stdl==0.5.4",
+            "stdl>=0.5.5",
         ],
         extras_require={
             "tests": [
