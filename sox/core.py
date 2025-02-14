@@ -4,7 +4,7 @@ import subprocess
 import time
 from pathlib import Path
 from subprocess import CalledProcessError
-from typing import Any, Iterable, List, Tuple
+from typing import Any, Iterable, Tuple
 
 import numpy as np
 from typing_extensions import Literal

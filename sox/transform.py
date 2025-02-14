@@ -16,8 +16,15 @@ import numpy as np
 from typing_extensions import Literal
 
 from . import file_info
-from .core import (ENCODING_VALS, VALID_FORMATS, EncodingValue, SoxError,
-                   is_number, play, sox)
+from .core import (
+    ENCODING_VALS,
+    VALID_FORMATS,
+    EncodingValue,
+    SoxError,
+    is_number,
+    play,
+    sox,
+)
 from .log import logger
 
 VERBOSITY_VALS = [0, 1, 2, 3, 4]

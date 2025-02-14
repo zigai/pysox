@@ -1,9 +1,10 @@
 """ Audio file info computed by soxi.
 """
+
 import os
 from numbers import Number
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict
 
 from .core import VALID_FORMATS, sox, soxi
 from .log import logger
